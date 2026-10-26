@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Conquest Reborn
+Comment=Conquest Reborn WoW launcher (Wine + DXVK)
+Exec=conquest-reborn
+Type=Application
+Categories=Game;
+StartupNotify=true
+Icon=applications-games

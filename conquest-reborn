@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# conquest-reborn — launch the Conquest Reborn launcher under Wine with all
+# Linux fixes applied. Put this on your PATH, edit the paths below once.
+set -euo pipefail
+
+# --- edit these -----------------------------------------------------------
+GAME_DIR="${CR_GAME_DIR:-/mnt/games/Conquest Reborn}"        # Ascension.exe lives here
+PREFIX="${CR_PREFIX:-$HOME/Games/conquest-reborn/pfx}"       # wine prefix
+LAUNCHER="${CR_LAUNCHER:-$HOME/Games/conquest-reborn/ConquestReborn-Launcher.exe}"
+WINE="${CR_WINE:-wine}"                                       # wine-staging recommended
+# ---------------------------------------------------------------------------
+
+export WINEPREFIX="$PREFIX"
+export WINEDEBUG=-all
+export WINEESYNC=1
+
+# divxtac=d       REQUIRED — DivxTac.dll hooks the netcode and breaks the
+#                 world-init stream: auth + char list work, then the client
+#                 hangs on the loading bar and the server's 30 s packet
+#                 watchdog disconnects it. (Also rename DivxTac.dll to
+#                 DivxTac.dll.disabled in the game folder as a backstop.)
+# d3d9=n, dxgi=n  load DXVK's d3d9→Vulkan translation instead of WineD3D —
+#                 roughly 2-3x the FPS on AMD. Needs dxvk's x32 dlls in the
+#                 prefix's drive_c/windows/syswow64/.
+export WINEDLLOVERRIDES="divxtac=d;d3d9=n;dxgi=n"
+
+# mullvad-exclude keeps the game traffic off the VPN tunnel — the world
+# server (46.225.96.145:8087) stalls mid-stream through Mullvad relays.
+# Delete this line if you don't run Mullvad.
+exec mullvad-exclude "$WINE" "$LAUNCHER" "$@"
